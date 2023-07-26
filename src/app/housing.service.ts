@@ -6,18 +6,23 @@ import { HousingLocation } from './housing-location';
 })
 export class HousingService {
     
-  url = 'http://localhost:3000/locations';
+  url = 'assets/json/db.json';
+  locations : HousingLocation[] = [];
 
   constructor() { }
 
   async getAllHousingLocations() : Promise<HousingLocation[]> {
        const data = await fetch(this.url);
-       return await data.json() ?? [];
+       const res = await data.json()
+       this.locations= res?.locations ?? [];
+        return this.locations;
   }
 
   async getHousingLocationById(id: Number): Promise<HousingLocation | undefined> {
-    const data = await fetch(`${this.url}/${id}`);
-    return await data.json() ?? {};
+     if (this.locations.length === 0){
+         await this.getAllHousingLocations();
+     } 
+     return this.locations.find(location => location?.id === id)
   }
 
   submitApplication(firstName: string, lastName: string, email: string){
